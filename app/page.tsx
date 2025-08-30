@@ -13,9 +13,30 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Github, Linkedin, Mail, ExternalLink, Menu, X } from "lucide-react";
+import emailjs from "emailjs-com";
 
 export default function Portfolio() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const sendEmail = (e: any) => {
+    e.preventDefault();
+
+    emailjs
+      .sendForm(
+        `${process.env.NEXT_PUBLIC_EMAIL_SERVICE_ID}`,
+        `${process.env.NEXT_PUBLIC_EMAIL_TEMPLATE_ID}`,
+        e.target,
+        `${process.env.NEXT_PUBLIC_EMAIL_PUBLIC_KEY}`
+      )
+      .then(
+        () => {
+          e.target.reset();
+        },
+        (error) => {
+          console.error("Failed to send email");
+        }
+      );
+  };
 
   const projects = [
     {
@@ -385,16 +406,28 @@ export default function Portfolio() {
               </div>
             </div>
 
-            <form className="space-y-6">
+            <form onSubmit={sendEmail} className="space-y-7">
               <div>
                 <Input
                   placeholder="Your Name"
+                  name="name"
+                  required
+                  className="bg-input border-border focus:border-accent"
+                />
+              </div>
+              <div>
+                <Input
+                  placeholder="Subject"
+                  name="subject"
+                  required
                   className="bg-input border-border focus:border-accent"
                 />
               </div>
               <div>
                 <Input
                   type="email"
+                  name="email"
+                  required
                   placeholder="Your Email"
                   className="bg-input border-border focus:border-accent"
                 />
@@ -402,11 +435,16 @@ export default function Portfolio() {
               <div>
                 <Textarea
                   placeholder="Your Message"
+                  name="message"
                   rows={5}
+                  required
                   className="bg-input border-border focus:border-accent resize-none"
                 />
               </div>
-              <Button className="w-full bg-accent hover:bg-accent/90">
+              <Button
+                type="submit"
+                className="w-full bg-accent hover:bg-accent/90"
+              >
                 Send Message
               </Button>
             </form>
